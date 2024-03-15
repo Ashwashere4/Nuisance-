@@ -1,0 +1,15 @@
+variables:
+  POSTGRES_DB: spotifyDatabase
+  POSTGRES_USER: Ash
+  POSTGRES_PASSWORD: Hello, World!
+  PYTHON_RUN: python3
+
+before_script:
+  - pip install -r requirements.txt
+
+testrunner:
+  script:
+    - echo "hello class"
+    - $PYTHON_RUN --version
+    - $PYTHON_RUN -m unittest -v
+  stage: test

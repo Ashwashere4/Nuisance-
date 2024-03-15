@@ -1,7 +1,9 @@
 import numpy as np
 
-fuckList = ["Oh wow, someone has a potty mouth!", "Oh? MMMM harder!!", 
-                 "Do you kiss your mother with that mouth?", "Someone learned how to curse! Good job!"
+fuckList = ["Oh wow, someone has a potty mouth!", 
+            "Oh? MMMM harder!!", 
+            "Do you kiss your mother with that mouth?", 
+            "Someone learned how to curse! Good job!"
 ]
 
 killList = ["Waaaa, Waaa someone is acting like a big baby!", 
