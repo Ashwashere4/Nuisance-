@@ -80,14 +80,14 @@ async def ping(ctx):
         min_value = 1,
         default = 30,)
 
-async def timer(
-    ctx : discord.ApplicationContext,
-    amount : int,
-):
-    await ctx.respond(f"Created a timer for {amount} minutes!")
-    user = ctx.author.id
-    time.sleep(amount)
-    await ctx.send(f"Timer is done! <@{user}>")
+# async def timer(
+#     ctx : discord.ApplicationContext,
+#     amount : int,
+# ):
+#     await ctx.respond(f"Created a timer for {amount} minutes!")
+#     user = ctx.author.id
+#     time.sleep(amount)
+#     await ctx.send(f"Timer is done! <@{user}>")
 
 @bot.slash_command()
 
