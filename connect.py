@@ -74,34 +74,20 @@ async def refreshplaylist(ctx):
 async def ping(ctx):
     await ctx.respond(f"AUGHHHHHHHHHHHHHHHHH {bot.latency}")
 
-@bot.slash_command()
-@option("amount", 
-        description = "Enter an amount in minutes",
-        min_value = 1,
-        default = 30,)
+# @bot.slash_command()
+# @option("amount", 
+#         description = "Enter an amount in minutes",
+#         min_value = 1,
+#         default = 30,)
 
-# async def timer(
-#     ctx : discord.ApplicationContext,
-#     amount : int,
-# ):
-#     await ctx.respond(f"Created a timer for {amount} minutes!")
-#     user = ctx.author.id
-#     time.sleep(amount)
-#     await ctx.send(f"Timer is done! <@{user}>")
+# # async def timer(
+# #     ctx : discord.ApplicationContext,
+# #     amount : int,
+# # ):
+# #     await ctx.respond(f"Created a timer for {amount} minutes!")
+# #     user = ctx.author.id
+# #     time.sleep(amount)
+# #     await ctx.send(f"Timer is done! <@{user}>")
 
-@bot.slash_command()
-
-async def recall(
-    ctx: discord.ApplicationContext,):
-
-    print(messageIDs[0])
-    message = ctx.channel.fetch_message(messageIDs[0])
-
-    for reaction in message.reactions: # iterate through every reaction in the message
-        if (reaction.count-1) > highest_reaction_number:
-        # (reaction.count-1) discounts the bot's reaction
-            highest_reaction = reaction.emoji
-            highest_reaction_count = reaction.count-1
-    await ctx.send(f"{highest_reaction} wins with {highest_reaction_count} votes!")
 
 bot.run(Token.getKey())
