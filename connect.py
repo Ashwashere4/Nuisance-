@@ -78,7 +78,7 @@ async def on_message(message):
                         sp.playlist_add_items(playlistID, [i])
                         playlistSet.add(track['id'])
 
-        await message.send("Song Successfully Added!")
+        await bot.user.send("Song Successfully Added!")
                         
 
 @bot.slash_command()
