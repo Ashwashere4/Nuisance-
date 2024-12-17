@@ -77,6 +77,8 @@ async def on_message(message):
                     if track['id'] not in playlistSet:
                         sp.playlist_add_items(playlistID, [i])
                         playlistSet.add(track['id'])
+
+        await message.send("Song Successfully Added!")
                         
 
 @bot.slash_command()
