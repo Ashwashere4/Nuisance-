@@ -66,7 +66,7 @@ async def on_message(message):
         #     await message.add_reaction('❌')
         #     await message.add_reaction('✅')
 
-        if "https://open.spotify.com/track/" in string:
+        if "https://open" in string:
             messageParsed = string.split()
 
             for i in messageParsed:
@@ -77,8 +77,8 @@ async def on_message(message):
                     if track['id'] not in playlistSet:
                         sp.playlist_add_items(playlistID, [i])
                         playlistSet.add(track['id'])
+                        await message.add_reaction('✅')
 
-        await message.add_reaction('✅')
                         
 
 @bot.slash_command()
