@@ -1,5 +1,6 @@
 
 import os
+import Responses
 import discord
 from discord import *
 import gitIgnore.Token as Token
@@ -21,6 +22,25 @@ async def on_ready():
         playlistSet.add(i['track']['id'])
     print("playlistSet Created!")
     print("Bot is Ready!")
+
+
+@bot.event
+async def on_message(message):
+    
+    string = message.content
+    lowerString = string.lower()
+    if message.author == message.author.bot:
+        return
+    
+    if message.author == client.user.bot:
+        return
+    
+    if string.isupper() == True:
+        await message.reply("Woah there buddy, you need to calm down!")
+    if "fuck" in lowerString:
+        await message.reply(Responses.fuckResponse())
+    if "kill myself" in lowerString:
+        await message.reply(Responses.killResponse())
 
 @bot.event
 async def on_message(message):
@@ -69,6 +89,25 @@ async def refreshplaylist(ctx):
 
     await ctx.respond("Refresh internal Playlist set!")
 
+@bot.slash_command()
+@option("user", 
+        description = "Type the user you want to stalk",
+        )
+async def find(ctx: discord.ApplicationContext,
+                           user: Member):
+    
+    await ctx.respond(f"Looking into {user} ... ")
+
+    if user == None:
+        await ctx.respond("User not found")
+    else:
+        await ctx.respond(f"User Found! Giving Information about {user}..."
+                          + f"\n {user.display_avatar} {user.display_name}"
+                          + f"\n Created at: {user.created_at}"
+                          + f"\n Activity: {user.activity}"
+        )
+    
+    
 @bot.slash_command()
 async def getplaylist(ctx):
     await ctx.respond("Here is the current song recommendation playlist: " + spotifyPlaylist)
