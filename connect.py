@@ -66,11 +66,11 @@ async def on_message(message):
         #     await message.add_reaction('❌')
         #     await message.add_reaction('✅')
 
-        if "https://open" in string:
+        if "https://open.spotify.com/track/" in string:
             messageParsed = string.split()
 
             for i in messageParsed:
-                if "https://open" in i:
+                if "https://open.spotify.com/track/" in i:
                     print(i)
                     track = sp.track(i)
 
@@ -94,14 +94,14 @@ async def refreshplaylist(ctx):
         description = "Type the user you want to stalk",
         )
 async def find(ctx: discord.ApplicationContext,
-                           user: Member):
+                           user: Member,):
     
-    await ctx.respond(f"Looking into {user} ... ")
+    await ctx.send(f"Looking into {user} ... ")
 
     if user == None:
-        await ctx.respond("User not found")
+        await ctx.send("User not found")
     else:
-        await ctx.respond(f"User Found! Giving Information about {user}..."
+        await ctx.send(f"User Found! Giving Information about {user}..."
                           + f"\n {user.display_avatar} {user.display_name}"
                           + f"\n Created at: {user.created_at}"
                           + f"\n Activity: {user.activity}"
@@ -116,21 +116,6 @@ async def getplaylist(ctx):
 @bot.slash_command()
 async def ping(ctx):
     await ctx.respond(f"AUGHHHHHHHHHHHHHHHHH {bot.latency}")
-
-# @bot.slash_command()
-# @option("amount", 
-#         description = "Enter an amount in minutes",
-#         min_value = 1,
-#         default = 30,)
-
-# async def timer(
-#     ctx : discord.ApplicationContext,
-#     amount : int,
-# ):
-#     await ctx.respond(f"Created a timer for {amount} minutes!")
-#     user = ctx.author.id
-#     time.sleep(amount)
-#     await ctx.send(f"Timer is done! <@{user}>")
 
 @bot.slash_command()
 async def refreshplaylist(ctx):
