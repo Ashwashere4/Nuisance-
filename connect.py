@@ -10,8 +10,7 @@ from spotifyapi import sp, playlistID, playlist, spotifyPlaylist
 bot = discord.Bot(intents=discord.Intents.all())
 messageIDs = []
 playlistSet = set()
-highest_reaction_number = 0
-highest_reaction = " "
+message_to_user = {}
 
 # databaseUtil.exec_sql_file('songRecommendation.sql')
 # databaseUtil.connect()
@@ -24,27 +23,26 @@ async def on_ready():
     print("Bot is Ready!")
 
 
-@bot.event
-async def on_message(message):
-    
-    string = message.content
-    lowerString = string.lower()
-    if message.author == message.author.bot:
-        return
-    
-    if message.author == client.user.bot:
-        return
-    
-    if string.isupper() == True:
-        await message.reply("Woah there buddy, you need to calm down!")
-    if "fuck" in lowerString:
-        await message.reply(Responses.fuckResponse())
-    if "kill myself" in lowerString:
-        await message.reply(Responses.killResponse())
+
 
 @bot.event
 async def on_message(message):
+
+    # string = message.content
+    # lowerString = string.lower()
+    # if message.author == message.author.bot:
+    #     return
     
+    # if message.author == client.user.bot:
+    #     return
+    
+    # if string.isupper() == True:
+    #     await message.reply("Woah there buddy, you need to calm down!")
+    # if "fuck" in lowerString:
+    #     await message.reply(Responses.fuckResponse())
+    # if "kill myself" in lowerString:
+        # await message.reply(Responses.killResponse())
+
     channelID = message.channel.id
 
     # 1051027505542340618 ash's chat
@@ -70,6 +68,7 @@ async def on_message(message):
             messageParsed = string.split()
 
             for i in messageParsed:
+
                 if "https://open.spotify.com/track/" in i:
                     print(i)
                     track = sp.track(i)
@@ -78,7 +77,42 @@ async def on_message(message):
                         sp.playlist_add_items(playlistID, [i])
                         playlistSet.add(track['id'])
                         await message.add_reaction('✅')
+                        await message.add_reaction('❌')
 
+                        message_to_user[message.id] = (message.author.id, track['id'])
+                        await message.reply('Song successfully added! If you made a mistake or change your mind, you can react with ❌ to undo your error')
+
+
+                    else:
+                        await message.reply("Either the song is already in the playlist or something went wrong. Wake up Ash if the latter")
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user.bot:
+        return
+
+    message = reaction.message
+
+    if reaction.emoji == '❌':
+
+        if message.id in message_to_user:
+            original_user_id, track_id = message_to_user[message.id]
+
+            if user.id == original_user_id:
+
+                if track_id in playlistSet:
+                    sp.playlist_remove_all_occurrences_of_items(playlistID, [track_id])
+                    playlistSet.remove(track_id)
+
+                    del message_to_user[message.id]
+
+                    await message.channel.send(f"{user.mention}, the song has been removed from the playlist")
+
+                else:
+                    await message.channel.send(f"The song is no longer in the playlist")
+            else:
+                await reaction.remove(user)
+                await message.channel.send(f"{user.mention}, only the original author can remove the song.")
                         
 
 @bot.slash_command()
