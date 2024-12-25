@@ -80,7 +80,6 @@ async def on_message(message):
                         await message.add_reaction('❌')
 
                         message_to_user[message.id] = (message.author.id, track['id'])
-                        await message.reply('Song successfully added! If you made a mistake or change your mind, you can react with ❌ to undo your error')
 
 
                     else:
