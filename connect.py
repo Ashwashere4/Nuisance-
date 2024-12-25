@@ -111,7 +111,6 @@ async def on_reaction_add(reaction, user):
                     await message.channel.send(f"The song is no longer in the playlist")
             else:
                 await reaction.remove(user)
-                await message.channel.send(f"{user.mention}, only the original author can remove the song.")
                         
 
 @bot.slash_command()
