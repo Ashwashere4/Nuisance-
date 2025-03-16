@@ -23,8 +23,6 @@ async def on_ready():
     print("Bot is Ready!")
 
 
-
-
 @bot.event
 async def on_message(message):
 
@@ -122,34 +120,16 @@ async def refreshplaylist(ctx):
         playlistSet.add(i['track']['id'])
 
     await ctx.respond("Refresh internal Playlist set!")
-
-@bot.slash_command()
-@option("user", 
-        description = "Type the user you want to stalk",
-        )
-async def find(ctx: discord.ApplicationContext,
-                           user: Member,):
-    
-    await ctx.send(f"Looking into {user} ... ")
-
-    if user == None:
-        await ctx.send("User not found")
-    else:
-        await ctx.send(f"User Found! Giving Information about {user}..."
-                          + f"\n {user.display_avatar} {user.display_name}"
-                          + f"\n Created at: {user.created_at}"
-                          + f"\n Activity: {user.activity}"
-        )
-    
     
 @bot.slash_command()
 async def getplaylist(ctx):
     await ctx.respond("Here is the current song recommendation playlist: " + spotifyPlaylist)
 
-    
 @bot.slash_command()
-async def ping(ctx):
-    await ctx.respond(f"AUGHHHHHHHHHHHHHHHHH {bot.latency}")
+async def houserules(ctx):
+    with open('houseRules.txt', 'r') as file:
+        content = file.read()
+    await ctx.respond(f"{content}")
 
 @bot.slash_command()
 async def refreshplaylist(ctx):
@@ -164,21 +144,6 @@ async def refreshplaylist(ctx):
 @bot.slash_command()
 async def ping(ctx):
     await ctx.respond(f"AUGHHHHHHHHHHHHHHHHH {bot.latency}")
-
-# @bot.slash_command()
-# @option("amount", 
-#         description = "Enter an amount in minutes",
-#         min_value = 1,
-#         default = 30,)
-
-# # async def timer(
-# #     ctx : discord.ApplicationContext,
-# #     amount : int,
-# # ):
-# #     await ctx.respond(f"Created a timer for {amount} minutes!")
-# #     user = ctx.author.id
-# #     time.sleep(amount)
-# #     await ctx.send(f"Timer is done! <@{user}>")
 
 
 bot.run(Token.getKey())
