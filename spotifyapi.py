@@ -11,7 +11,7 @@ sp = spotipy.Spotify(
         redirect_uri="http://localhost:7777/callback."
     )
 ) 
-spotifyPlaylist = "https://open.spotify.com/playlist/0uSVUHhS11fBhDaJd9YoY6?si=4ad3057b7cc84580"
+spotifyPlaylist = "https://open.spotify.com/playlist/2spDgih9iB4xATKTZcyDDg?si=2a3c7f66ded2489b"
 playlistID = (sp.playlist(spotifyPlaylist))['id']
 playlist = (sp.playlist(spotifyPlaylist))
 test = sp.playlist(spotifyPlaylist)
