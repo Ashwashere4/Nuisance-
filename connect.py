@@ -15,6 +15,7 @@ playlistSet = set()
 message_to_user = {}
 reaction_confirmations = defaultdict(set)
 reaction_confirmationsNegative = defaultdict(set)
+messageAfterReason = []
 
 # databaseUtil.exec_sql_file('songRecommendation.sql')
 # databaseUtil.connect()
@@ -45,27 +46,30 @@ async def on_message(message):
 
     # Ash's server ID: 1110542946660536383
     # Forbidden Sock ID: 1216427171833188503
-    if channelID == 1216427171833188503 :
+    if channelID == 1110542946660536383 :
         # Load the existing song data
         song_data = load_data_from_json()
         string = message.content
 
-        # if "idea" in (string.lower()):
-        #     print(message.id)
-        #     messageIDs.append(message.id)
-        #     await message.add_reaction('❌')
-        #     await message.add_reaction('✅')
-
+        
         if "https://open" in string:
             messageParsed = string.split()
 
             for i in messageParsed:
 
                 if "https://open.spotify.com/track/" in i:
-                    print(i)
                     track = sp.track(i)
 
                     if not any(song['track_id'] == track['id'] for song in song_data):
+                    
+                        # Extract the part of the message after "Reason:"
+                        reason_message = "No reason posted yet"
+                        if "reason:" in string.lower():
+                            # Split message and get the part after "Reason:"
+                            reason_message = string.split("reason:")[1].strip()
+                            print(reason_message)
+                    
+
                     # Temporarily store the track info before adding
                         message_to_user[message.id] = {
                             'user_id': message.author.id,
@@ -73,12 +77,13 @@ async def on_message(message):
                             'track_url': i,
                             'track_name': track['name'],
                             'artist': track['artists'][0]['name'],
-                            'user_name': message.author.name
+                            'user_name': message.author.name,
+                            'Reason': reason_message
                     }
 
                         await message.add_reaction('✅')
                         await message.add_reaction('❌')
-                        await message.reply("Song being considered, state your defense!")
+                        await message.reply("Song being considered")
 
                     else:
                         await message.reply("Either the song is already in the playlist or something went wrong. Wake up Ash if the latter")
@@ -95,11 +100,11 @@ async def on_reaction_add(reaction, user):
     if reaction.emoji == '✅' and message.id in message_to_user:
         track_info = message_to_user[message.id]
 
-        # Prevent the author from confirming their own song
-        if user.id == track_info['user_id']:
-            await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
-            await reaction.remove(user)
-            return
+        # # # Prevent the author from confirming their own song
+        # if user.id == track_info['user_id']:
+        #     await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
+        #     await reaction.remove(user)
+        #     return
 
         # Add the reaction if it's not from the author
         reaction_confirmations[message.id].add(user.id)
@@ -114,11 +119,13 @@ async def on_reaction_add(reaction, user):
                 'artist': track_info['artist'],
                 'user_id': track_info['user_id'],
                 'track_id': track_info['track_id'],
-                'user_name': track_info['user_name']
+                'user_name': track_info['user_name'],
+                'Reason' : track_info['Reason']
             })
+
             save_data_to_json(song_data)
 
-            await message.channel.send(f"✅ Added **{track_info['track_name']}** by **{track_info['artist']}** to the playlist!")
+            await message.channel.send(f"{message.author.mention}, ✅ Added **{track_info['track_name']}** by **{track_info['artist']}** to the playlist!")
 
             # Clean up
             del message_to_user[message.id]
@@ -152,7 +159,7 @@ async def on_reaction_add(reaction, user):
 
                     del message_to_user[message.id]
 
-                    await message.channel.send(f"{user.mention}, the song has been removed from consideration")
+                    await message.channel.send(f"{message.author.mention}, the song has been removed from consideration")
 
                 else:
                     await message.channel.send(f"The song is no longer in the playlist")
@@ -172,7 +179,7 @@ async def listplaylist(ctx):
 
     # Build a list of formatted lines
     formatted_entries = [
-        f"**{song['track_name']}** by *{song['artist']}* — added by **{song['user_name']}**"
+        f"**{song['track_name']}** by *{song['artist']}* — added by **{song['user_name']}** \n *Reason*: {song['Reason']}"
         for song in song_data
     ]
 
