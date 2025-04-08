@@ -3,3 +3,5 @@ db.yml
 spotifykeys.py
 
 .cache
+
+songs_data.json

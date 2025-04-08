@@ -6,6 +6,8 @@ import discord
 from discord import *
 import gitIgnore.Token as Token
 import time
+from collections import Counter
+import json
 from spotifyapi import sp, playlistID, playlist, spotifyPlaylist
 from helperFunctions import save_data_to_json, load_data_from_json
 
@@ -16,16 +18,22 @@ message_to_user = {}
 reaction_confirmations = defaultdict(set)
 reaction_confirmationsNegative = defaultdict(set)
 messageAfterReason = []
+noSubmitList = []
 
 # databaseUtil.exec_sql_file('songRecommendation.sql')
 # databaseUtil.connect()
 
 @bot.event
 async def on_ready():
-    for i in playlist["tracks"]["items"]:
-        playlistSet.add(i['track']['id'])
-    print("playlistSet Created!")
     print("Bot is Ready!")
+
+def get_artist_genres(artist_name):
+    # Search for the artist by name
+    result = sp.search(q='artist:' + artist_name, type='artist', limit=1)
+    if result['artists']['items']:
+        artist = result['artists']['items'][0]
+        return artist['genres']
+    return []
 
 
 @bot.event
@@ -52,8 +60,14 @@ async def on_message(message):
         string = message.content
 
         
+        
         if "https://open" in string:
             messageParsed = string.split()
+
+            # Check if the user is in the noSubmitList
+            if message.author.name in noSubmitList:
+                await message.reply("You are on the do not submit list and cannot submit songs.")
+                return
 
             for i in messageParsed:
 
@@ -65,9 +79,9 @@ async def on_message(message):
                         # Extract the part of the message after "Reason:"
                         reason_message = "No reason posted yet"
                         if "reason:" in string.lower():
-                            # Split message and get the part after "Reason:"
-                            reason_message = string.split("reason:")[1].strip()
-                            print(reason_message)
+                        # Find the position of 'reason:', and get the part after it
+                            reason_index = string.lower().find("reason:")
+                            reason_message = string[reason_index + len("reason:"):].strip()
                     
 
                     # Temporarily store the track info before adding
@@ -101,17 +115,17 @@ async def on_reaction_add(reaction, user):
         track_info = message_to_user[message.id]
 
         # # # Prevent the author from confirming their own song
-        # if user.id == track_info['user_id']:
-        #     await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
-        #     await reaction.remove(user)
-        #     return
+        if user.id == track_info['user_id']:
+            await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
+            await reaction.remove(user)
+            return
 
         # Add the reaction if it's not from the author
         reaction_confirmations[message.id].add(user.id)
 
         if len(reaction_confirmations[message.id]) >= 2:
             # Add the track to the playlist
-            sp.playlist_add_items(playlistID, [track_info['track_url']])
+            # sp.playlist_add_items(playlistID, [track_info['track_url']])
 
             # Update JSON
             song_data.append({
@@ -124,6 +138,14 @@ async def on_reaction_add(reaction, user):
             })
 
             save_data_to_json(song_data)
+
+            # Add the author of the song to the noSubmitList
+            noSubmitList.append(track_info['user_name'])
+
+            # If the length of noSubmitList exceeds 2, pop the first element
+            if len(noSubmitList) > 2:
+                freedom = noSubmitList.pop(0)
+                await message.channel.send(f"{freedom.author.mention}, you are released from your shackles")
 
             await message.channel.send(f"{message.author.mention}, ✅ Added **{track_info['track_name']}** by **{track_info['artist']}** to the playlist!")
 
@@ -170,6 +192,10 @@ async def getplaylist(ctx):
     await ctx.respond("Here is the current song recommendation playlist: " + spotifyPlaylist)
 
 @bot.slash_command()
+async def getnolist(ctx):
+    await ctx.respond(f"Here are the people in gay baby jail: {noSubmitList}")
+
+@bot.slash_command()
 async def listplaylist(ctx):
     song_data = load_data_from_json()
 
@@ -193,10 +219,34 @@ async def listplaylist(ctx):
         await ctx.respond(output)
 
 @bot.slash_command()
-async def houserules(ctx):
-    with open('houseRules.txt', 'r') as file:
-        content = file.read()
-    await ctx.respond(f"{content}")
+async def distribution(ctx):
+    # Load data from JSON file
+    with open('songs_data.json', 'r') as f:
+        data = json.load(f)
+    
+    # List to store the genres
+    all_genres = []
+
+    # Loop through each track in the data
+    for entry in data:
+        artist = entry["artist"]
+        genres = get_artist_genres(artist)
+        if genres:
+            all_genres.extend(genres)
+
+    # Count the frequency of each genre
+    genre_count = Counter(all_genres)
+
+    # Prepare the message to be sent
+    genre_message = ""
+    for genre, count in genre_count.items():
+        genre_message += f"{genre}: {count} songs\n"
+
+    # Send the genre distribution message
+    if genre_message:
+        await ctx.send(genre_message)
+    else:
+        await ctx.send("No genres found.")
 
 @bot.slash_command()
 async def ping(ctx):
