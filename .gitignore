@@ -3,6 +3,6 @@ discloud.config
 db.yml
 spotifykeys.py
 
-.cache
+.spotify_cache
 
 songs_data.json

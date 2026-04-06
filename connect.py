@@ -109,10 +109,10 @@ async def on_reaction_add(reaction, user):
     if reaction.emoji == '✅' and message.id in message_to_user:
 
         # # # Prevent the author from confirming their own song
-        if user.id == track_info['user_id']:
-            await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
-            await reaction.remove(user)
-            return
+        # if user.id == track_info['user_id']:
+        #     await reaction.message.channel.send(f"{user.mention}, you can't vote for your own song!")
+        #     await reaction.remove(user)
+        #     return
 
         # Add the reaction if it's not from the author
         reaction_confirmations[message.id].add(user.id)

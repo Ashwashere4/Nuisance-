@@ -5,7 +5,7 @@ from app_token import SPOTIFYTOKEN, SPOTIFYSECRET
 sp = spotipy.Spotify(
     auth_manager=SpotifyOAuth(
         scope="playlist-modify-public playlist-modify-private",
-        cache_path = "Nuisance-/.cache",
+        cache_path = ".spotify_cache",
         client_id=SPOTIFYTOKEN,
         client_secret=SPOTIFYSECRET,
         redirect_uri="http://127.0.0.1:7777/callback",
