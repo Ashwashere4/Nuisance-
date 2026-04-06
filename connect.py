@@ -1,11 +1,7 @@
 
 from collections import defaultdict
-import os
-import Responses
 import discord
-from discord import *
-import gitIgnore.Token as Token
-import time
+from app_token import TOKEN
 from collections import Counter
 import json
 from spotifyapi import sp, playlistID, playlist, spotifyPlaylist
@@ -54,12 +50,11 @@ async def on_message(message):
 
     # Ash's server ID: 1110542946660536383
     # Forbidden Sock ID: 1216427171833188503
-    if channelID == 1110542946660536383 :
+    if channelID == 1216427171833188503 :
         # Load the existing song data
         song_data = load_data_from_json()
         string = message.content
 
-        
         
         if "https://open" in string:
             messageParsed = string.split()
@@ -109,10 +104,9 @@ async def on_reaction_add(reaction, user):
 
     message = reaction.message
     song_data = load_data_from_json()
-
+    track_info = message_to_user[message.id]
 
     if reaction.emoji == '✅' and message.id in message_to_user:
-        track_info = message_to_user[message.id]
 
         # # # Prevent the author from confirming their own song
         if user.id == track_info['user_id']:
@@ -125,7 +119,7 @@ async def on_reaction_add(reaction, user):
 
         if len(reaction_confirmations[message.id]) >= 2:
             # Add the track to the playlist
-            # sp.playlist_add_items(playlistID, [track_info['track_url']])
+            sp.playlist_add_items(playlistID, [track_info['track_url']])
 
             # Update JSON
             song_data.append({
@@ -164,27 +158,11 @@ async def on_reaction_add(reaction, user):
 
             reaction_confirmationsNegative[message.id].add(user.id)
 
-            if len(reaction_confirmationsNegative[message.id]) >= 2:
+            # print (user.id == track_info['user_id'])
+            if len(reaction_confirmationsNegative[message.id]) >= 2 or user.id == track_info['user_id']:
 
-                # Load the current song data
-                song_data = load_data_from_json()
+                await message.channel.send(f"{message.author.mention}, the song has been removed from consideration")
 
-                if any(song['track_id'] for song in song_data):
-                    # Remove the track from the playlist
-                    sp.playlist_remove_all_occurrences_of_items(playlistID, [track_id])
-
-                    # Remove the song from the JSON data
-                    song_data = [song for song in song_data if song['track_id'] != track_id]
-
-                    # Save the updated data back to the JSON file
-                    save_data_to_json(song_data)
-
-                    del message_to_user[message.id]
-
-                    await message.channel.send(f"{message.author.mention}, the song has been removed from consideration")
-
-                else:
-                    await message.channel.send(f"The song is no longer in the playlist")
             
     
 @bot.slash_command()
@@ -248,8 +226,21 @@ async def distribution(ctx):
     else:
         await ctx.send("No genres found.")
 
+@bot.slash_command(name="shutdown", description="Safely disconnects the bot and stops the script")
+async def shutdown(ctx):
+    # Security check: Only the owner can run this
+    if ctx.author.id == 123456789012345678: # Replace with your Discord ID
+        await ctx.respond("Shutting down...", ephemeral=True)
+        
+        print(f"Shutdown command received from {ctx.author}")
+        
+        # This closes the connection to Discord gateway and the aiohttp session
+        await bot.close() 
+    else:
+        await ctx.respond("Permission denied. Only the bot owner can use this command.", ephemeral=True)
+
 @bot.slash_command()
 async def ping(ctx):
     await ctx.respond(f"AUGHHHHHHHHHHHHHHHHH {bot.latency}")
 
-bot.run(Token.getKey())
+bot.run(TOKEN)

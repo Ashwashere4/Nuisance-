@@ -10,7 +10,7 @@ def load_data_from_json():
 
 # Function to save the updated data back to the JSON file
 def save_data_to_json(data):
-    with open('songs_data.json', 'w') as file:
+    with open('Nuisance-/songs_data.json', 'w') as file:
         json.dump(data, file, indent=4)
 
 # Load the existing song data

@@ -1,18 +1,18 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import gitIgnore.spotifykeys as spotifykeys
-import json
+from app_token import SPOTIFYTOKEN, SPOTIFYSECRET
 
 sp = spotipy.Spotify(
     auth_manager=SpotifyOAuth(
-        scope="playlist-modify-public",
-        client_id=spotifykeys.getID(),
-        client_secret=spotifykeys.getSecretID(),
-        redirect_uri="http://localhost:7777/callback.",
+        scope="playlist-modify-public playlist-modify-private",
+        cache_path = "Nuisance-/.cache",
+        client_id=SPOTIFYTOKEN,
+        client_secret=SPOTIFYSECRET,
+        redirect_uri="http://127.0.0.1:7777/callback",
         open_browser=False
     )
 ) 
-spotifyPlaylist = "https://open.spotify.com/playlist/4gzwjaY1vyE5WltMC5xn8V?si=328848c4e16f437a"
+spotifyPlaylist = "https://open.spotify.com/playlist/0dDDFVhe7xzNFUxVsKXTCW?si=y3A69WBKSFqfYDBNdaJ4DA"
 playlistID = (sp.playlist(spotifyPlaylist))['id']
 playlist = (sp.playlist(spotifyPlaylist))
 

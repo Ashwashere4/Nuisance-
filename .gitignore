@@ -1,4 +1,5 @@
-Token.py
+app_token.py
+discloud.config
 db.yml
 spotifykeys.py
 
